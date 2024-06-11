@@ -11,7 +11,8 @@ image_foldername = 'snapshots'
 class VideoProcessor:
 
     def __init__(self, video_file, output_destination=None, snapshot_keyword='foto', begin_keyword='begin',
-                 end_keyword='eind', force_new_transcription=False, title=''):
+                 end_keyword='eind', force_new_transcription=False, title='', enable_intermezzo=False,
+                 enable_begin_photo=True, enable_end_photo=True):
         """
 
         :param video_file: video file to be analyzed
@@ -37,6 +38,9 @@ class VideoProcessor:
             self._output_destination = Path(output_destination)
         self._transcription = self._transcribe(force_new=force_new_transcription)
         self._title = title
+        self._enable_intermezzo = enable_intermezzo
+        self._enable_begin_photo = enable_begin_photo
+        self._enable_end_photo = enable_end_photo
 
     def _transcribe(self,silent=False, force_new=False,):
         output_file = self._output_destination / f'{self._video_name}_transcribed.txt'
@@ -235,7 +239,7 @@ class VideoProcessor:
         based on the lines in the transcription. Photos are included at the begin of each step and each time
         the instruction to create a photo is recorded. If a separate end keyword is used, a photo is included at the
         end as well
-        :return:
+        :return: html filename
         """
         steps = self.get_steps()
         
@@ -263,7 +267,8 @@ class VideoProcessor:
 
                     step_info = step[1]
 
-                    prt(self._descr_image(step_info['start'], f'Begintoestand stap {nr_steps}'))   
+                    if self._enable_begin_photo:
+                        prt(self._descr_image(step_info['start'], f'Begintoestand stap {nr_steps}'))
 
                     lines = step_info['lines']
                     for line in lines:
@@ -272,10 +277,10 @@ class VideoProcessor:
                         elif 'image' == line[0]:
                             prt(self._descr_image(line[1],f'{self._snapshot_keyword.capitalize()} tussenstap'))
                     
-                    if 'end' in step_info:
+                    if 'end' in step_info and self._enable_end_photo:
                         prt(self._descr_image(step_info['end'], f'Eindtoestand stap {nr_steps}'))  
 
-                elif step[0] == 'intermediate':
+                elif step[0] == 'intermediate' and self._enable_intermezzo:
                     prt(self._descr_intermediate_title())
                     lines = step[1]
                     for line in lines:
@@ -285,6 +290,7 @@ class VideoProcessor:
                             prt(self._descr_image(line[1],f'{self._snapshot_keyword.capitalize()}'))
 
         print(f'created {outfilename} and {htmloutfilename}')
+        return htmloutfilename
 
     def _descr_title(self, title):
         return '## Stappenplan ' + title
