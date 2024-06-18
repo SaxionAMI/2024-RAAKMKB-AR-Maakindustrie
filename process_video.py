@@ -53,7 +53,7 @@ class VideoProcessor:
 
         audio = wt.load_audio(self._video_file)
         model = wt.load_model("medium", device="cpu")
-        result = wt.transcribe(model, audio)
+        result = wt.transcribe(model, audio, temperature=0.3)
 
         with open(output_file, 'w') as out:
             out.write(json.dumps(result, indent=2, ensure_ascii=False))
