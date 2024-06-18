@@ -67,6 +67,7 @@ def do_main():
 	input = Entry(topFrame, width=50)
 	input.grid(row=rownum, column=colnum)
 	input.insert(0, config[config_name])
+	input.xview_moveto(1) # show right hand side of textfield
 	ui_elements[config_name] = input
 
 	colnum += 1
@@ -84,6 +85,7 @@ def do_main():
 	input = Entry(topFrame, width=50)
 	input.grid(row=rownum, column=colnum)
 	input.insert(0, config[config_name])
+	input.xview_moveto(1)
 	ui_elements[config_name] = input
 
 	colnum += 1
@@ -212,6 +214,7 @@ def browse_video_clicked():
 	if foldername:
 		ui_element.delete(0, END)
 		ui_element.insert(0, foldername)
+		ui_element.xview_moveto(1)
 		process_config_fields()
 
 def browse_path_clicked():
@@ -221,6 +224,7 @@ def browse_path_clicked():
 	if foldername:
 		ui_element.delete(0, END)
 		ui_element.insert(0, foldername)
+		ui_element.xview_moveto(1)
 		process_config_fields()
 
 def toggle_endword():
