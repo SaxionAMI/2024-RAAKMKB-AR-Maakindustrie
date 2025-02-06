@@ -1,4 +1,11 @@
-from glob import glob
+"""
+
+Eenvoudige user interface (tkinter) voor process_video.Videoprocessor.
+Het programma is een demonstrator om een instructieset (stappenplan) te genereren op basis van
+gesproken tekst in een videoclip. Zie verder documentatie van process_video.Videoprocessor.
+Gemaakt in het kader van het RAAK MKB project AR in de maakindustrie
+"""
+__author__ = "Etto Salomons, Lectoraat Ambient Intelligence, Saxion Enschede"
 import os
 import traceback
 import json
@@ -16,20 +23,20 @@ from process_video import VideoProcessor
 ###################
 # SETTING / NAMES TO BE CHANGED!!!
 ###################
-toolname = 'video2instruction'
-app_title = 'Instruction From Video'
+_toolname = 'video2instruction'
+_app_title = 'Instruction From Video'
 ###################
 # END SETTINGS TO BE CHANGED!!!
 ###################
 
 
-cfg_file = os.path.expanduser('~') + f'/{toolname}_settings.cfg'
+_cfg_file = os.path.expanduser('~') + f'/{_toolname}_settings.cfg'
 
 # Components
-root = Tk()
+_root = Tk()
 
-ui_elements = dict()
-default_config = {
+_ui_elements = dict()
+_default_config = {
 	'str_video_file': '',
 	'str_output_path':'',
 	'str_title':'Report Title',
@@ -38,19 +45,20 @@ default_config = {
 	'str_begin_word':'stap',
 	'chk_use_stop':1,
 	'str_end_word':'klaar',
+	'chk_photo_caption_txt':0,
 	'chk_add_begin_photo':0,
 	'chk_add_end_photo':0,
 }
 
 def do_main():
-	config = read_file_config()
+	config = _read_file_config()
 
-	root.resizable(False, False)  # zorgt ervoor dat nieuw window niet gegroepeerd wordt
-	root.option_add("*Font", ui_font())
-	topFrame = Frame(root)
-	bottomFrame = Frame(root)
+	_root.resizable(False, False)  # zorgt ervoor dat nieuw window niet gegroepeerd wordt
+	_root.option_add("*Font", _ui_font())
+	topFrame = Frame(_root)
+	bottomFrame = Frame(_root)
 
-	root.title(app_title)
+	_root.title(_app_title)
 
 
 	# top Frame
@@ -68,10 +76,10 @@ def do_main():
 	input.grid(row=rownum, column=colnum)
 	input.insert(0, config[config_name])
 	input.xview_moveto(1) # show right hand side of textfield
-	ui_elements[config_name] = input
+	_ui_elements[config_name] = input
 
 	colnum += 1
-	browse_but = Button(topFrame, text='Browse', command=browse_video_clicked)
+	browse_but = Button(topFrame, text='Browse', command=_browse_video_clicked)
 	browse_but.grid(row=rownum, column=colnum)
 
 	# output path row
@@ -86,10 +94,10 @@ def do_main():
 	input.grid(row=rownum, column=colnum)
 	input.insert(0, config[config_name])
 	input.xview_moveto(1)
-	ui_elements[config_name] = input
+	_ui_elements[config_name] = input
 
 	colnum += 1
-	browse_but = Button(topFrame, text='Browse', command=browse_path_clicked)
+	browse_but = Button(topFrame, text='Browse', command=_browse_path_clicked)
 	browse_but.grid(row=rownum, column=colnum)
 
 	# title path row
@@ -103,7 +111,7 @@ def do_main():
 	input = Entry(topFrame, width=30)
 	input.grid(row=rownum, column=colnum, sticky=W)
 	input.insert(0, config[config_name])
-	ui_elements[config_name] = input
+	_ui_elements[config_name] = input
 
 	# start keyword row
 	#--------------------------
@@ -116,7 +124,7 @@ def do_main():
 	input = Entry(topFrame, width=20)
 	input.grid(row=rownum, column=colnum, sticky=W)
 	input.insert(0, config[config_name])
-	ui_elements[config_name] = input
+	_ui_elements[config_name] = input
 
 
 	# end keyword row
@@ -125,16 +133,16 @@ def do_main():
 	colnum = 0
 	config_name = 'chk_use_stop'
 	check_var = IntVar(value=config[config_name])
-	check_box = Checkbutton(topFrame, variable=check_var, text='Stap eindwoord',command=toggle_endword)
+	check_box = Checkbutton(topFrame, variable=check_var, text='Stap eindwoord', command=_toggle_endword)
 	check_box.grid(sticky=W, row=rownum, column=colnum)
-	ui_elements[config_name] = check_var
+	_ui_elements[config_name] = check_var
 
 	colnum += 1
 	config_name = 'str_end_word'
 	input = Entry(topFrame, width=20)
 	input.grid(row=rownum, column=colnum, sticky=W)
 	input.insert(0, config[config_name])
-	ui_elements[config_name] = input
+	_ui_elements[config_name] = input
 
 
 
@@ -149,7 +157,17 @@ def do_main():
 	input = Entry(topFrame, width=20)
 	input.grid(row=rownum, column=colnum, sticky=W)
 	input.insert(0, config[config_name])
-	ui_elements[config_name] = input
+	_ui_elements[config_name] = input
+
+	# include photo text as caption
+	#--------------------------
+	rownum += 1
+	colnum = 1
+	config_name = 'chk_photo_caption_txt'
+	check_var = IntVar(value=config[config_name])
+	check_box = Checkbutton(topFrame, variable=check_var, text='Foto tekst als onderschrift')
+	check_box.grid(sticky=W, row=rownum, column=colnum)
+	_ui_elements[config_name] = check_var
 
 	# include intermezzo
 	#--------------------------
@@ -159,8 +177,8 @@ def do_main():
 	check_var = IntVar(value=config[config_name])
 	check_box = Checkbutton(topFrame, variable=check_var, text='Neem intermezzo op')
 	check_box.grid(sticky=W, row=rownum, column=colnum)
-	ui_elements['intermezzo_chck'] = check_box
-	ui_elements[config_name] = check_var
+	_ui_elements['intermezzo_chck'] = check_box
+	_ui_elements[config_name] = check_var
 
 	# include begin photo
 	#--------------------------
@@ -170,7 +188,7 @@ def do_main():
 	check_var = IntVar(value=config[config_name])
 	check_box = Checkbutton(topFrame, variable=check_var, text='Neem beginfoto op')
 	check_box.grid(sticky=W, row=rownum, column=colnum)
-	ui_elements[config_name] = check_var
+	_ui_elements[config_name] = check_var
 
 	# include end photo
 	#--------------------------
@@ -180,77 +198,77 @@ def do_main():
 	check_var = IntVar(value=config[config_name])
 	check_box = Checkbutton(topFrame, variable=check_var, text='Neem eindfoto op')
 	check_box.grid(sticky=W, row=rownum, column=colnum)
-	ui_elements['endphoto_chck'] = check_box
-	ui_elements[config_name] = check_var
+	_ui_elements['endphoto_chck'] = check_box
+	_ui_elements[config_name] = check_var
 
-
-	toggle_endword()
+	_toggle_endword()
 
 	# bottom Frame
 	start_but = Button(bottomFrame)
-	start_but.configure(text='Start', command=start_clicked)
+	start_but.configure(text='Start', command=_start_clicked)
 	start_but.pack(side=LEFT)
-	cancel_but = Button(bottomFrame, text='Cancel', command=close_app)
+	cancel_but = Button(bottomFrame, text='Cancel', command=_close_app)
 	cancel_but.pack(side=LEFT)
 
 	topFrame.pack(side=TOP, fill=X, pady=3)
 	bottomFrame.pack(side=BOTTOM, fill=X, pady=3)
 
-	root.protocol("WM_DELETE_WINDOW", close_app)
-	root.eval('tk::PlaceWindow . center')
-	root.mainloop()
+	_root.protocol("WM_DELETE_WINDOW", _close_app)
+	_root.eval('tk::PlaceWindow . center')
+	_root.mainloop()
 
 ################
 # BUTTON HANDLERS
 ################
-def close_app():
-	process_config_fields()
-	root.destroy()
+def _close_app():
+	_process_config_fields()
+	_root.destroy()
 
-def browse_video_clicked():
-	ui_element = ui_elements['str_video_file']
+def _browse_video_clicked():
+	ui_element = _ui_elements['str_video_file']
 	intdir = os.path.dirname(ui_element.get())
 	foldername = askopenfilename(title='Selecteer video', initialdir=intdir)
 	if foldername:
 		ui_element.delete(0, END)
 		ui_element.insert(0, foldername)
 		ui_element.xview_moveto(1)
-		process_config_fields()
+		_process_config_fields()
 
-def browse_path_clicked():
-	ui_element = ui_elements['str_output_path']
+def _browse_path_clicked():
+	ui_element = _ui_elements['str_output_path']
 	intdir = os.path.dirname(ui_element.get())
 	foldername = askdirectory(title='Selecteer folder', initialdir=intdir)
 	if foldername:
 		ui_element.delete(0, END)
 		ui_element.insert(0, foldername)
 		ui_element.xview_moveto(1)
-		process_config_fields()
+		_process_config_fields()
 
-def toggle_endword():
-	if ui_elements['chk_use_stop'].get():
-		ui_elements['str_end_word'].config(state=NORMAL)
-		ui_elements['intermezzo_chck'].config(state=NORMAL)
-		ui_elements['endphoto_chck'].config(state=NORMAL)
+def _toggle_endword():
+	if _ui_elements['chk_use_stop'].get():
+		_ui_elements['str_end_word'].config(state=NORMAL)
+		_ui_elements['intermezzo_chck'].config(state=NORMAL)
+		_ui_elements['endphoto_chck'].config(state=NORMAL)
 	else:
-		ui_elements['str_end_word'].config(state=DISABLED)
-		ui_elements['intermezzo_chck'].config(state=DISABLED)
-		ui_elements['endphoto_chck'].config(state=DISABLED)
+		_ui_elements['str_end_word'].config(state=DISABLED)
+		_ui_elements['intermezzo_chck'].config(state=DISABLED)
+		_ui_elements['endphoto_chck'].config(state=DISABLED)
 
 
-def start_clicked():
-	process_config_fields()
+def _start_clicked():
+	_process_config_fields()
 	try:
-		video_file = ui_elements['str_video_file'].get()
-		out_path = ui_elements['str_output_path'].get()
-		title = ui_elements['str_title'].get()
-		kw_photo = ui_elements['str_photo_keyword'].get()
-		kw_begin = ui_elements['str_begin_word'].get()
-		kw_end = ui_elements['str_end_word'].get()
-		enable_end = ui_elements['chk_use_stop'].get()
-		enable_intermezzo = ui_elements['chk_enable_intermezzo'].get()
-		enable_begin_photo = ui_elements['chk_add_begin_photo'].get()
-		enable_end_photo = ui_elements['chk_add_end_photo'].get()
+		video_file = _ui_elements['str_video_file'].get()
+		out_path = _ui_elements['str_output_path'].get()
+		title = _ui_elements['str_title'].get()
+		kw_photo = _ui_elements['str_photo_keyword'].get()
+		kw_begin = _ui_elements['str_begin_word'].get()
+		kw_end = _ui_elements['str_end_word'].get()
+		enable_end = _ui_elements['chk_use_stop'].get()
+		enable_intermezzo = _ui_elements['chk_enable_intermezzo'].get()
+		enable_begin_photo = _ui_elements['chk_add_begin_photo'].get()
+		enable_end_photo = _ui_elements['chk_add_end_photo'].get()
+		add_photocaption = _ui_elements['chk_photo_caption_txt'].get()
 
 		if not enable_end:
 			kw_end = ''
@@ -264,7 +282,8 @@ def start_clicked():
 			title=title,
 			enable_intermezzo=enable_intermezzo,
 			enable_begin_photo=enable_begin_photo,
-			enable_end_photo=enable_end_photo
+			enable_end_photo=enable_end_photo,
+			add_photo_line_as_caption=add_photocaption
 		)
 
 		htmlfile = processor.create_description()
@@ -276,8 +295,8 @@ def start_clicked():
 							 f'Fout tijdens uitvoering. Details:\n{traceback.format_exc()}')
 
 
-def show_result_window(txt):
-	resultWindow = tkinter.Toplevel(root)
+def _show_result_window(txt):
+	resultWindow = tkinter.Toplevel(_root)
 
 	resultWindow.title('Resultaat')
 	resultWindow.geometry('1000x800+200+200')
@@ -299,7 +318,7 @@ def show_result_window(txt):
 						width=1000,
 						yscrollcommand=SVBar.set,
 						xscrollcommand=SHBar.set,
-						wrap="none", font=txt_font())
+						wrap="none", font=_txt_font())
 
 	TBox.pack(expand=0, fill=BOTH)
 	TBox.insert(END, txt)
@@ -321,18 +340,18 @@ def show_result_window(txt):
 # font defs
 ####################
 
-def ui_font():
-	if runs_on_win():
+def _ui_font():
+	if _runs_on_win():
 		return ('Arial', 14)
 	return ('Arial', 18)
 
-def ui_font_bold():
-	if runs_on_win():
+def _ui_font_bold():
+	if _runs_on_win():
 		return ('Arial', 14, 'bold')
 	return ('Arial', 18, 'bold')
 
-def txt_font():
-	if runs_on_win():
+def _txt_font():
+	if _runs_on_win():
 		return ('Courier', 14)
 	return ('Courier', 18)
 
@@ -340,34 +359,34 @@ def txt_font():
 # Config management
 #################
 
-def read_file_config():
-	config = copy.deepcopy(default_config)
+def _read_file_config():
+	config = copy.deepcopy(_default_config)
 	
-	if os.path.exists(cfg_file):
-		with open(cfg_file, 'r') as infile:
+	if os.path.exists(_cfg_file):
+		with open(_cfg_file, 'r') as infile:
 			file_config = json.load(infile)
-			for config_item in default_config:
+			for config_item in _default_config:
 				if config_item in file_config:
 					config[config_item] = file_config[config_item]
 	else:
-		with open(cfg_file, 'w') as outfile:
+		with open(_cfg_file, 'w') as outfile:
 			json.dump(config, outfile)
 	return config
 
 
-def process_config_fields():
+def _process_config_fields():
 	config = dict()
-	for config_item in ui_elements:
-		if config_item in default_config:
-			config[config_item] = ui_elements[config_item].get()
+	for config_item in _ui_elements:
+		if config_item in _default_config:
+			config[config_item] = _ui_elements[config_item].get()
 
-	with open(cfg_file, 'w') as outfile:
+	with open(_cfg_file, 'w') as outfile:
 		json.dump(config, outfile)
 
 	return config
 
 
-def runs_on_win():
+def _runs_on_win():
 	return 'windows' in platform.system().lower()
 
 
