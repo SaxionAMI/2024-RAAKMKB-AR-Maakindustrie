@@ -7,8 +7,8 @@ Installatie
 -----------
 
 
-* Download en installeer python versie 3.10.0
-	Ga naar: https://www.python.org/downloads/release/python-3100/
+* Download en installeer python versie 3.10.19 (of later)
+	Ga naar: https://www.python.org/downloads/release/python-31019/
 	Download de Windows installer (64-bit)
 	Voer het gedownloade bestand uit om python te installeren. Selecteer de bovenste optie (standaard installatie)
 * Maak een map aan op je systeem en kopieer de volgende bestanden naar die map:
